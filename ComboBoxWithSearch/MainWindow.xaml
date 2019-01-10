@@ -1,0 +1,169 @@
+﻿<Window x:Class="ComboBoxWithSearch.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ComboBoxWithSearch"
+        mc:Ignorable="d"
+        Title="ComboBoxWithSearch" Height="450" Width="800"
+        Background="#f5f6fa">
+    <Window.DataContext>
+        <local:ViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <Style TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="#353b48"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border Padding="2"
+                                Margin="0,2,0,2"
+                                SnapsToDevicePixels="True">
+                            <Grid>
+                                <Ellipse x:Name="indicator"
+                                         Width="8"
+                                         Height="8"
+                                         Fill="#f5f6fa"
+                                         Margin="10,0,0,0"
+                                         HorizontalAlignment="Left"
+                                         VerticalAlignment="Center"/>
+                                <ContentPresenter Margin="30,0,0,0"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="indicator" Property="Ellipse.Fill" Value="#00a8ff"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ComboBox Grid.Row="0"
+                  VerticalAlignment="Top"
+                  HorizontalAlignment="Center"
+                  Margin="20"
+                  SelectedItem="{Binding SelectedCountry}"
+                  ItemsSource="{Binding FilteredCountries, Mode=OneWay}">
+            <ComboBox.Style>
+                <Style TargetType="{x:Type ComboBox}">
+                    <Setter Property="Width" Value="400"/>
+                    <Setter Property="Height" Value="40"/>
+                    <Setter Property="FontFamily" Value="Verdana"/>
+                    <Setter Property="FontSize" Value="16"/>
+                    <Setter Property="Foreground" Value="#353b48"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ComboBox}">
+                                <Grid>
+                                    <ToggleButton Cursor="Hand"
+                                          ClickMode="Press"
+                                          Focusable="False"
+                                          IsChecked="{Binding Path=IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                                        <ToggleButton.Template>
+                                            <ControlTemplate TargetType="ToggleButton">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="35"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Grid.ColumnSpan="2"
+                                                            CornerRadius="0"
+                                                            BorderThickness="0"
+                                                            Background="#dcdde1"/>
+                                                    <Border Grid.Column="1"
+                                                            Margin="0,5,0,5"
+                                                            BorderThickness="1,0,0,0"
+                                                            BorderBrush="#7f8fa6"/>
+                                                    <Path Grid.Column="1"
+                                                          Data="M 0 0 L 6 6 L 12 0 Z"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"
+                                                          Fill="#353b48"
+                                                          x:Name="arrow"/>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </ToggleButton.Template>
+                                    </ToggleButton>
+                                    <ContentPresenter Margin="10,0,0,0"
+                                                      IsHitTestVisible="False"
+                                                      HorizontalAlignment="Left"
+                                                      VerticalAlignment="Center"
+                                                      Content="{TemplateBinding ComboBox.SelectionBoxItem}"
+                                                      ContentTemplate="{TemplateBinding ComboBox.SelectionBoxItemTemplate}"
+                                                      ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
+                                    <TextBox Name="PART_EditableTextBox"                   
+                                             IsReadOnly="{TemplateBinding IsReadOnly}"
+                                             Visibility="Hidden"
+                                             Background="Transparent"
+                                             HorizontalAlignment="Left" 
+                                             VerticalAlignment="Center"
+                                             Focusable="True">
+                                        <TextBox.Template>
+                                            <ControlTemplate TargetType="TextBox" >
+                                                <Border Name="PART_ContentHost" Focusable="False" />
+                                            </ControlTemplate>
+                                        </TextBox.Template>
+                                    </TextBox>
+                                    <Popup Placement="Bottom"
+                                           Focusable="False"
+                                           AllowsTransparency="True"
+                                           IsOpen="{TemplateBinding ComboBox.IsDropDownOpen}"
+                                           PopupAnimation="Fade">
+                                        <Grid SnapsToDevicePixels="True"
+                                              MinWidth="{TemplateBinding FrameworkElement.ActualWidth}"
+                                              MaxHeight="{TemplateBinding ComboBox.MaxDropDownHeight}">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+                                            <Border Grid.RowSpan="2" 
+                                                    Background="#dcdde1"
+                                                    Margin="0"
+                                                    CornerRadius="0" 
+                                                    BorderThickness="0"/>
+                                            <TextBox Grid.Row="0"
+                                                     Margin="10,5"
+                                                     Padding="2"
+                                                     Background="#f5f6fa"
+                                                     Height="30"
+                                                     FontSize="16"
+                                                     Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <ScrollViewer Grid.Row="1" 
+                                                          SnapsToDevicePixels="True"
+                                                          Margin="0,0,0,10">
+                                                <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                            </ScrollViewer>
+                                        </Grid>
+                                    </Popup>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ComboBox.Style>
+        </ComboBox>
+        <WrapPanel Grid.Row="1"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Margin="10">
+            <Label Content="Selected country: "
+                   FontFamily="Verdana"
+                   FontSize="16"/>
+            <Label Content="{Binding SelectedCountry, Mode=OneWay}"
+                   FontFamily="Verdana"
+                   FontSize="16"
+                   FontWeight="DemiBold"/>
+        </WrapPanel>
+    </Grid>
+</Window>
